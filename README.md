@@ -89,7 +89,7 @@ All baseline scripts share identical data loading, split strategy, loss function
 
 ```bash
 # Clone repository
-git clone https://github.com/<your-username>/CPGN.git
+git clone https://github.com/sanjaylopa22/CPGN.git
 cd CPGN
 
 # Create virtual environment
