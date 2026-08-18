@@ -135,10 +135,10 @@ Predicting on validation set ...
   MAD:MAE ratio              : 17.18
 
   ── Band Gap  Eg  (eV) ──
-  MAE                        : 0.2920
+  MAE                        : 0.2800
   MAD (this split)           : 1.3615
   MAD (paper, global)        : 0.434
-  MAD:MAE ratio              : 4.66
+  MAD:MAE ratio              : 4.86
 
   ── Stability Classification ──
   Accuracy                   : 0.9900
