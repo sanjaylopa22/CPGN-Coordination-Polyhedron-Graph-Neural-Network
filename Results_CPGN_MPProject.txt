@@ -1,4 +1,4 @@
-(venv) sanch@balawar:~/Documents/MS/CPGN$ python cpgn_mp_upgraded.py
+(venv) custodian@yon:~/Documents/MS/CPGN/results_CPGN/result_2$ python cpgn_mp_upgraded_300.py
 Device : cuda
 ======================================================================
   CPGN Upgraded — mp.2018.6.1.json
@@ -18,26 +18,26 @@ Parsing structures ...
   Band gap: 39,845/60,000 train entries have Eg>0  (real DFT)
 
   [TRAIN] Building dual+line graphs for 60,000 structures ...
-    ... 5,000/60,000  (797s)
-    ... 10,000/60,000  (1553s)
-    ... 15,000/60,000  (2283s)
-    ... 20,000/60,000  (2995s)
-    ... 25,000/60,000  (3700s)
-    ... 30,000/60,000  (4434s)
-    ... 35,000/60,000  (5166s)
-    ... 40,000/60,000  (5883s)
-    ... 45,000/60,000  (6623s)
-    ... 50,000/60,000  (7381s)
-    ... 55,000/60,000  (8136s)
-    ... 60,000/60,000  (8910s)
+    ... 5,000/60,000  (852s)
+    ... 10,000/60,000  (1674s)
+    ... 15,000/60,000  (2487s)
+    ... 20,000/60,000  (3295s)
+    ... 25,000/60,000  (4095s)
+    ... 30,000/60,000  (4934s)
+    ... 35,000/60,000  (5762s)
+    ... 40,000/60,000  (6572s)
+    ... 45,000/60,000  (7400s)
+    ... 50,000/60,000  (8226s)
+    ... 55,000/60,000  (9043s)
+    ... 60,000/60,000  (9885s)
   [TRAIN] Built 60,000  skipped 0
 
   [VAL] Building dual+line graphs for 5,000 structures ...
-    ... 5,000/5,000  (754s)
+    ... 5,000/5,000  (821s)
   [VAL] Built 5,000  skipped 0
 
   [TEST] Building dual+line graphs for 4,239 structures ...
-    ... 4,239/4,239  (632s)
+    ... 4,239/4,239  (691s)
   [TEST] Built 4,239  skipped 0
 
   Saving graph cache → cpgn_graph_cache.pkl ...
@@ -47,35 +47,73 @@ Parsing structures ...
   CPGN Upgraded — mp.2018.6.1.json
   Params      : 4,852,419
   Train/Val   : 60,000 / 5,000
-  Epochs      : 500  Batch : 64  LR : 0.0003
-  Loss        : MAE (primary Ef) + 0.1×(MAE Bg + BCE stab)
-  Scheduler   : CosineAnnealingLR  T_max=500
-  Checkpoint  : best val Ef MAE
+  Epochs      : 300 (full — no early stopping)
+  Batch       : 64  LR : 0.0001
+  Loss        : MAE (primary Ef) + 0.1×(MAE Bg)
+  Scheduler   : CosineAnnealingLR  T_max=300  eta_min=1e-6
+  Checkpoint  : best val Ef MAE (saved throughout all epochs)
 ======================================================================
      Ep |   TrLoss |   VlLoss |    TrMAE |    VlMAE |        LR |   Time
   --------------------------------------------------------------
-      1 |   0.3363 |   0.3447 |   0.2327 |   0.2576 |  3.00e-04 | 270.6s
-      2 |   0.2276 |   0.2519 |   0.1490 |   0.1782 |  3.00e-04 | 261.7s
-      3 |   0.1942 |   0.2309 |   0.1250 |   0.1582 |  3.00e-04 | 260.8s
-      4 |   0.1761 |   0.2922 |   0.1120 |   0.2296 |  3.00e-04 | 259.1s
-      5 |   0.1620 |   0.2396 |   0.1019 |   0.1802 |  3.00e-04 | 261.9s
-     10 |   0.1254 |   0.1940 |   0.0768 |   0.1404 |  3.00e-04 | 262.4s
-     20 |   0.0990 |   0.1503 |   0.0598 |   0.1066 |  2.99e-04 | 259.8s
-     30 |   0.0843 |   0.1355 |   0.0502 |   0.0931 |  2.97e-04 | 262.7s
-     40 |   0.0773 |   0.1486 |   0.0461 |   0.1103 |  2.95e-04 | 263.9s
-     50 |   0.0699 |   0.1376 |   0.0415 |   0.1001 |  2.93e-04 | 261.0s
-     60 |   0.0663 |   0.1492 |   0.0397 |   0.1122 |  2.90e-04 | 262.8s
-     70 |   0.0625 |   0.1222 |   0.0373 |   0.0858 |  2.86e-04 | 260.3s
-     80 |   0.0581 |   0.1270 |   0.0348 |   0.0899 |  2.82e-04 | 260.7s
-     90 |   0.0553 |   0.1390 |   0.0329 |   0.1029 |  2.77e-04 | 263.8s
-    100 |   0.0527 |   0.1258 |   0.0315 |   0.0888 |  2.71e-04 | 262.2s
-    110 |   0.0499 |   0.1332 |   0.0299 |   0.0961 |  2.66e-04 | 260.4s
-    120 |   0.0480 |   0.1251 |   0.0288 |   0.0905 |  2.59e-04 | 263.9s
-    130 |   0.0455 |   0.1276 |   0.0273 |   0.0897 |  2.53e-04 | 260.9s
-    140 |   0.0443 |   0.1354 |   0.0265 |   0.0993 |  2.46e-04 | 261.8s
-  Early stopping ep 147 (best val MAE=0.0745)
+      1 |   0.3745 |   0.3511 |   0.2587 |   0.2597 |  1.00e-04 |  94.4s
+  [ckpt] ep=  1  new best val MAE = 0.2597
+      2 |   0.2478 |   0.2996 |   0.1617 |   0.2160 |  1.00e-04 |  93.2s
+  [ckpt] ep=  2  new best val MAE = 0.2160
+      3 |   0.2170 |   0.2722 |   0.1383 |   0.1931 |  1.00e-04 |  94.1s
+  [ckpt] ep=  3  new best val MAE = 0.1931
+      4 |   0.1995 |   0.2707 |   0.1254 |   0.1940 |  1.00e-04 |  93.5s
+      5 |   0.1851 |   0.2848 |   0.1152 |   0.1935 |  9.99e-05 |  93.3s
+  [ckpt] ep=  6  new best val MAE = 0.1343
+  [ckpt] ep=  7  new best val MAE = 0.1104
+     10 |   0.1469 |   0.2222 |   0.0896 |   0.1643 |  9.97e-05 |  93.4s
+  [ckpt] ep= 18  new best val MAE = 0.1012
+     20 |   0.1140 |   0.1504 |   0.0675 |   0.0996 |  9.89e-05 |  93.5s
+  [ckpt] ep= 20  new best val MAE = 0.0996
+  [ckpt] ep= 21  new best val MAE = 0.0940
+  [ckpt] ep= 25  new best val MAE = 0.0900
+  [ckpt] ep= 26  new best val MAE = 0.0843
+     30 |   0.0964 |   0.1463 |   0.0561 |   0.1018 |  9.76e-05 |  93.5s
+  [ckpt] ep= 32  new best val MAE = 0.0771
+     40 |   0.0861 |   0.1251 |   0.0501 |   0.0827 |  9.57e-05 |  93.5s
+  [ckpt] ep= 41  new best val MAE = 0.0736
+  [ckpt] ep= 48  new best val MAE = 0.0690
+     50 |   0.0771 |   0.1163 |   0.0444 |   0.0757 |  9.34e-05 |  93.5s
+  [ckpt] ep= 51  new best val MAE = 0.0685
+     60 |   0.0713 |   0.1299 |   0.0411 |   0.0892 |  9.05e-05 |  93.5s
+  [ckpt] ep= 63  new best val MAE = 0.0628
+     70 |   0.0658 |   0.1014 |   0.0378 |   0.0627 |  8.73e-05 |  93.6s
+  [ckpt] ep= 70  new best val MAE = 0.0627
+  [ckpt] ep= 74  new best val MAE = 0.0619
+     80 |   0.0613 |   0.1100 |   0.0350 |   0.0697 |  8.36e-05 |  93.5s
+  [ckpt] ep= 84  new best val MAE = 0.0609
+     90 |   0.0570 |   0.1133 |   0.0325 |   0.0734 |  7.96e-05 |  93.6s
+    100 |   0.0537 |   0.1050 |   0.0305 |   0.0671 |  7.52e-05 |  93.6s
+  [ckpt] ep=104  new best val MAE = 0.0592
+    110 |   0.0507 |   0.1045 |   0.0287 |   0.0656 |  7.06e-05 |  93.4s
+    120 |   0.0479 |   0.1023 |   0.0271 |   0.0633 |  6.58e-05 |  93.5s
+    130 |   0.0451 |   0.1108 |   0.0255 |   0.0702 |  6.08e-05 |  93.5s
+    140 |   0.0431 |   0.1008 |   0.0242 |   0.0617 |  5.57e-05 |  93.6s
+    150 |   0.0407 |   0.1063 |   0.0229 |   0.0669 |  5.05e-05 |  93.5s
+  [ckpt] ep=151  new best val MAE = 0.0581
+    160 |   0.0386 |   0.1077 |   0.0217 |   0.0683 |  4.53e-05 |  93.6s
+  [ckpt] ep=166  new best val MAE = 0.0554
+    170 |   0.0369 |   0.1006 |   0.0205 |   0.0610 |  4.02e-05 |  93.6s
+  [ckpt] ep=175  new best val MAE = 0.0538
+    180 |   0.0354 |   0.1002 |   0.0196 |   0.0608 |  3.52e-05 |  93.5s
+    190 |   0.0336 |   0.1085 |   0.0186 |   0.0677 |  3.04e-05 |  93.5s
+    200 |   0.0323 |   0.1038 |   0.0178 |   0.0628 |  2.57e-05 |  93.6s
+    210 |   0.0313 |   0.1077 |   0.0171 |   0.0658 |  2.14e-05 |  93.6s
+    220 |   0.0301 |   0.1048 |   0.0165 |   0.0635 |  1.74e-05 |  93.6s
+    230 |   0.0291 |   0.1038 |   0.0158 |   0.0623 |  1.37e-05 |  93.4s
+    240 |   0.0283 |   0.1030 |   0.0153 |   0.0608 |  1.05e-05 |  93.5s
+    250 |   0.0278 |   0.1039 |   0.0150 |   0.0618 |  7.63e-06 |  93.6s
+    260 |   0.0274 |   0.1020 |   0.0147 |   0.0605 |  5.28e-06 |  93.8s
+    270 |   0.0268 |   0.1032 |   0.0143 |   0.0613 |  3.42e-06 |  93.6s
+    280 |   0.0266 |   0.1049 |   0.0142 |   0.0625 |  2.08e-06 |  93.6s
+    290 |   0.0264 |   0.1044 |   0.0141 |   0.0620 |  1.27e-06 |  93.6s
+    300 |   0.0263 |   0.1044 |   0.0141 |   0.0621 |  1.00e-06 |  93.6s
 
-  Total : 38572.8s  |  Best val Ef MAE = 0.0645 eV/atom
+  Total : 28058.1s  |  Best val Ef MAE = 0.0538 eV/atom  (ep saved to cpgn_mp_best.pt)
 
   Plotting training curve ...
   Saved: CPGN_MP_training_curve.png
@@ -89,9 +127,12 @@ Predicting on validation set ...
   Samples                    : 5,000
 
   ── Formation Energy  Ef  (eV/atom) ──
-  MAE                        : 0.0645
-  MSE                        : 0.0133
-  MAD:MAE ratio              : 14.3
+  MAE                        : 0.0538
+  MSE                        : 0.0110
+  RMSE                       : 0.1050
+  MAD (this split)           : 0.9234
+  MAD (paper, global)        : 0.930
+  MAD:MAE ratio              : 17.18
 
   ── Band Gap  Eg  (eV) ──
   MAE                        : 0.2920
@@ -114,18 +155,16 @@ Predicting on test set ...
   Samples                    : 4,239
 
   ── Formation Energy  Ef  (eV/atom) ──
-  MAE                        : 0.0666
-  MSE                        : 0.0154
+  MAE                        : 0.0545
+  MSE                        : 0.0128
+  RMSE                       : 0.1132
   MAD (this split)           : 0.9382
   MAD (paper, global)        : 0.930
-  MAD:MAE ratio              : 14.1
+  MAD:MAE ratio              : 17.22
 
   ── Band Gap  Eg  (eV) ──
-  MAE                        : 0.2726
-  MAD (this split)           : 1.3720
-  MAD (paper, global)        : 0.434
-  MAD:MAE ratio              : 5.03
-  ALIGNN benchmark MAD:MAE   : 6.19
+  MAE                        : 0.2510
+  MAD:MAE ratio              : 5.40
 
   ── Stability Classification ──
   Accuracy                   : 0.9899
@@ -139,9 +178,10 @@ Predicting on test set ...
   Saved: CPGN_MP_benchmark_table.png
 
   Split  : Train=60,000 | Val=5,000 | Test=4,239  (shuffled, SEED=42)
-  Val Ef MAE  : 0.0645 eV/atom
-  Test Ef MAE : 0.0666 eV/atom
-  MAD:MAE     : 14.1  
+  Val Ef MAE  : 0.0538 eV/atom
+  Test Ef MAE : 0.0545 eV/atom
+  Test MAD    : 0.9382 eV/atom
+  MAD:MAE     : 17.22  (ALIGNN=42.27, MEGNet=33.2, CGCNN=23.8)
 ======================================================================
 
   Output files:
