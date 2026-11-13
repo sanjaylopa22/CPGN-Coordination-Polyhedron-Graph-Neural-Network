@@ -1,63 +1,6 @@
-#!/usr/bin/env python3
 """
 PotNet - JARVIS-DFT baseline on the CPGN protocol          python potnet_jarvis_dft.py
 =====================================================================================
-Run it exactly like cpgn_jarvis_dft.py: no arguments needed. Edit the CONFIG block
-below (or pass the same options on the command line) and run
-
-        python potnet_jarvis_dft.py
-
-Put it in the folder where cpgn_jarvis_dft.py was run. If cpgn_jarvis_test.csv is
-there, PotNet is scored on exactly CPGN's test structures and a side-by-side table
-is printed at the end. Everything is resumable: stop it any time and run it again.
-
-What one run does  (stages: check -> setup -> export -> train -> collect)
------------------------------------------------------------------------
- check    verifies the python environment (torch, torch_geometric, ignite, ...)
- setup    clones the OFFICIAL PotNet code (divelab/AIRS), builds the GSL library and
-          the Cython summation module it needs, applies one numerically identical
-          compatibility fix, and tests the summation against exact values
- export   loads JARVIS dft_3d, reproduces the CPGN split, writes PotNet's
-          custom-dataset files for every property
- train    one official PotNet run per (property, seed), then scores the test set
-          with the best-VALIDATION checkpoint (your CPGN script's protocol)
- collect  validates every prediction file against the split, writes
-          potnet_jarvis_test.csv / potnet_jarvis_summary.csv / potnet_vs_cpgn.csv, plots
-
-Same data and split as cpgn_jarvis_dft.py (checked against its source by test)
------------------------------------------------------------------------------
-  data    jarvis.db.figshare.data("dft_3d")          -> 75,993 entries (jarvis-tools 2026.4.2)
-  split   random.Random(42).shuffle(range(len)); train = first min(37711, len-10000),
-          then 5,000 val and 5,000 test (47,711 used; the other 28,282 are never used)
-  labels  None / "na" / NaN / inf / unparsable = missing, as in extract_targets()
-
-PotNet is trained per property on the labelled structures of each split (the
-official custom-dataset mode). Its own configs/potnet.yaml is used unchanged
-(500 epochs, lr 1e-3, batch 64, AdamW, OneCycle); only random_seed / epochs can be set.
-
-Compatibility fixes (PotNet was written for Python 3.9, numpy 1.21, pydantic 1.x,
-jarvis-tools 2022.9.16; a current environment needs these; each is printed when used)
-------------------------------------------------------------------------------------
-  * GSL + Cython extension must be built, and LD_LIBRARY_PATH must contain GSL's lib
-    folder, otherwise "libgsl.so.27: cannot open shared object file"      (automated)
-  * data.py uses `astype(np.int)`, removed in numpy 1.24 -> `astype(int)`  (identical)
-  * jarvis-tools >= 2022.12 changed nearest_neighbor_edges(use_canonize) from False to
-    True, which silently gives PotNet different graphs (e.g. SrTiO3: 94 vs 170 edges);
-    the launcher restores False (verified identical to 2022.9.16 on 5 structures)
-  * jarvis.core.graphs does `import dgl` at module level (PotNet needs two of its numpy functions
-    only); DGL is not installable for a current torch, so a stand-in module is used
-  * torch >= 2.6 refuses to load PyG files by default -> TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
-  * pydantic >= 2 lacks BaseSettings -> PotNet's config is loaded through pydantic.v1
-  * torch_sparse (only used by an option that is off) is stubbed when not installed
-
-Dataset version warning: the split depends on len(dft_3d). jarvis-tools 2022.12.11 ...
-2026.4.2 serve the 75,993-entry file used in your paper; 2022.9.16 serves 55,722 and
-2026.6.12 a ~94k file. The script refuses any other length (--allow-other-total).
-
-Dependencies (same venv as CPGN is fine): torch, torch_geometric, jarvis-tools,
-pymatgen, pytorch-ignite, pandarallel, periodictable, pyyaml, scikit-learn, pandas,
-matplotlib, scipy, joblib, tqdm; to build PotNet's extension: cython, setuptools,
-gcc, make (and git to clone). Missing packages are listed by the check stage.
 """
 import argparse
 import csv
@@ -89,7 +32,7 @@ TRAIN_PYTHON = None               # None: the python running this script
 DATASET_JSON = None               # None: load with jarvis-tools like cpgn_jarvis_dft.py
 PROPS = "main8"                   # main8 (paper Table 5) | all | e.g. "Ef,Eg_opt,Kv"
 SEEDS = [42]                      # e.g. [42, 43, 44] for mean +/- std
-EPOCHS = 100                     # None: PotNet's official 500
+EPOCHS = 200                     # None: PotNet's official 500
 SELECTION = "best_val"            # best_val (CPGN's protocol) | last_epoch (PotNet's default)
 ALIGN_TO = "cpgn_jarvis_test.csv"  # used when this file exists
 REUSE_CACHE = True                # seeds of one property reuse PotNet's preprocessing
