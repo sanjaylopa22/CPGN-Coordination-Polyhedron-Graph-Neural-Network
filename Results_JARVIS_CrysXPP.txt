@@ -1,0 +1,191 @@
+(venv) custodian@yon:~/Documents/MS/CPGN/results_CPGN/JARVIS$ python crysxpp_jarvis_dft.py --smoke 50 --epochs 5 --props Ef,Eg_opt --work-dir crysxpp_smoke
+======================================================================
+  CrysXPP - JARVIS-DFT   (CPGN split and protocol)
+  stages     : check -> setup -> export -> train -> collect
+  properties : Ef, Eg_opt
+  seeds      : [42]   epochs: 5   checkpoint: best validation (patched)
+  work dir   : /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_smoke
+  CPGN csv   : cpgn_jarvis_test.csv
+======================================================================
+Environment (/home/custodian/Documents/MS/venv/bin/python):
+  ok      torch           2.11.0+cu128
+  ok      pymatgen        ok
+  ok      sklearn         1.7.2
+  ok      scipy           1.17.1
+  ok      jarvis          2026.4.2
+  ok      numpy           2.3.5
+  ok      matplotlib      3.10.9
+  ok      pytz            2026.1.post1
+  ok      tqdm            4.67.3
+  CUDA available: True  NVIDIA GeForce RTX 5090
+Cloning the official CrysXPP code from https://github.com/kdmsit/crysxpp.git (code only, without the multi-GB data folder) ...
+  $ git clone --depth 1 --filter=blob:none --sparse https://github.com/kdmsit/crysxpp.git crysxpp    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS)
+  $ git -C crysxpp sparse-checkout set --no-cone /src /model /data/atom_init.json /README.md    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS)
+CrysXPP code: /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp
+  patched: /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src/data_prop.py  (3 edits, original saved as .orig)
+  patched: /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src/main.py  (6 edits, original saved as .orig)
+  patched: /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src/main.py  ([CPGN-baseline patch: labels])
+Obtaining 3D dataset 76k ...
+Reference:https://doi.org/10.1016/j.commatsci.2025.114063
+Other versions:https://doi.org/10.6084/m9.figshare.6815699
+Loading the zipfile...
+Loading completed.
+Dataset: 75,993 entries from jarvis.db.figshare.data("dft_3d")   (jarvis-tools 2026.4.2)
+Split  : train 50  val 50  test 50   (shuffle seed 42)   [SMOKE subset]
+
+  Labelled structures per property (train / val / test):
+    Ef            50      50      50
+    Eg_opt        50      50      50
+Exported 150 structures and 2 property datasets to /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_smoke/
+2 properties x seeds [42]   (resumable; 5 epochs, SGD lr 0.01, batch 256, 16 data-loading workers)
+
+[1/2] Ef   (train 50 / val 50 / test 50)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_smoke/data/Ef/ --train-size 50 --val-size 50 --test-size 50 --pretrained-model ../model/model_pretrain.pth --epochs 5 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 0.1 min; best validation MAE = 0.7786; test MAE of that model = 0.8891
+
+[2/2] Eg_opt   (train 50 / val 50 / test 50)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_smoke/data/Eg_opt/ --train-size 50 --val-size 50 --test-size 50 --pretrained-model ../model/model_pretrain.pth --epochs 5 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 0.1 min; best validation MAE = 0.5579; test MAE of that model = 0.55336
+Scoring on the 5,000 test structures of cpgn_jarvis_test.csv
+
+============================================================================================
+  CrysXPP JARVIS-DFT - test results   (checkpoint: best_val; MAE mean +/- std over seeds)
+============================================================================================
+  Property  n_train  n_test seeds             MAE      RMSE      R2  MAD:MAE
+  Ef             50      50     1    0.8891 +/-0.0000    1.1761   0.090     0.97
+  Eg_opt         50      50     1    0.5534 +/-0.0000    1.1920  -0.175     1.79
+============================================================================================
+  MAD:MAE uses the paper's MAD (Table 5) where defined, otherwise the test-set MAD.
+
+============================================================================================
+  CrysXPP vs CPGN on the same test structures   (lower MAE is better)
+============================================================================================
+  Property   n_test  CrysXPP MAE    CPGN MAE CrysXPP/CPGN   better
+  Ef             50       0.8891      0.1196         7.43   CPGN
+  Eg_opt         50       0.5534      0.1189         4.65   CPGN
+============================================================================================
+  wrote 1 per-seed CSV(s); crysxpp_jarvis_test.csv = first seed
+
+Done.
+(venv) custodian@yon:~/Documents/MS/CPGN/results_CPGN/JARVIS$ python crysxpp_jarvis_dft.py
+======================================================================
+  CrysXPP - JARVIS-DFT   (CPGN split and protocol)
+  stages     : check -> setup -> export -> train -> collect
+  properties : Ef, Eg_opt, Eg_mbj, SLME, Spill, Kv, Gv, ehull
+  seeds      : [42]   epochs: 200   checkpoint: best validation (patched)
+  work dir   : /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis
+  CPGN csv   : cpgn_jarvis_test.csv
+======================================================================
+Environment (/home/custodian/Documents/MS/venv/bin/python):
+  ok      torch           2.11.0+cu128
+  ok      pymatgen        ok
+  ok      sklearn         1.7.2
+  ok      scipy           1.17.1
+  ok      jarvis          2026.4.2
+  ok      numpy           2.3.5
+  ok      matplotlib      3.10.9
+  ok      pytz            2026.1.post1
+  ok      tqdm            4.67.3
+  CUDA available: True  NVIDIA GeForce RTX 5090
+CrysXPP code: /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp
+  already patched: /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src/data_prop.py
+  already patched: /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src/main.py
+  already patched ([CPGN-baseline patch: labels]): main.py
+Obtaining 3D dataset 76k ...
+Reference:https://doi.org/10.1016/j.commatsci.2025.114063
+Other versions:https://doi.org/10.6084/m9.figshare.6815699
+Loading the zipfile...
+Loading completed.
+Dataset: 75,993 entries from jarvis.db.figshare.data("dft_3d")   (jarvis-tools 2026.4.2)
+Split  : train 37,711  val 5,000  test 5,000   (shuffle seed 42)   [unused entries: 28,282]
+  parsed train: 10,000  (2s)
+  parsed train: 20,000  (3s)
+  parsed train: 30,000  (3s)
+
+  Labelled structures per property (train / val / test):
+    Ef        37,711   5,000   5,000
+    Eg_opt    37,711   5,000   5,000
+    Eg_mbj     9,885   1,311   1,271
+    SLME       4,905     675     614
+    Spill      5,709     738     751
+    Kv        11,898   1,494   1,543
+    Gv        11,898   1,494   1,543
+    ehull     37,711   5,000   5,000
+  wrote 10,000 CIFs (2s)
+  wrote 20,000 CIFs (4s)
+  wrote 30,000 CIFs (6s)
+  wrote 40,000 CIFs (9s)
+Exported 47,711 structures and 8 property datasets to /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis/
+8 properties x seeds [42]   (resumable; 100 epochs, SGD lr 0.01, batch 256, 16 data-loading workers)
+
+[1/8] Ef   (train 37,711 / val 5,000 / test 5,000)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis/data/Ef/ --train-size 37711 --val-size 5000 --test-size 5000 --pretrained-model ../model/model_pretrain.pth --epochs 100 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 37.4 min; best validation MAE = 0.1021; test MAE of that model = 0.10308
+
+[2/8] Eg_opt   (train 37,711 / val 5,000 / test 5,000)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis/data/Eg_opt/ --train-size 37711 --val-size 5000 --test-size 5000 --pretrained-model ../model/model_pretrain.pth --epochs 100 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 40.0 min; best validation MAE = 0.2670; test MAE of that model = 0.26363
+
+[3/8] Eg_mbj   (train 9,885 / val 1,311 / test 1,271)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis/data/Eg_mbj/ --train-size 9885 --val-size 1311 --test-size 1271 --pretrained-model ../model/model_pretrain.pth --epochs 100 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 9.3 min; best validation MAE = 0.5274; test MAE of that model = 0.58531
+
+[4/8] SLME   (train 4,905 / val 675 / test 614)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis/data/SLME/ --train-size 4905 --val-size 675 --test-size 614 --pretrained-model ../model/model_pretrain.pth --epochs 100 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 7.2 min; best validation MAE = 6.8917; test MAE of that model = 6.96973
+
+[5/8] Spill   (train 5,709 / val 738 / test 751)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis/data/Spill/ --train-size 5709 --val-size 738 --test-size 751 --pretrained-model ../model/model_pretrain.pth --epochs 100 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 6.0 min; best validation MAE = 0.3996; test MAE of that model = 0.41732
+
+[6/8] Kv   (train 11,898 / val 1,494 / test 1,543)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis/data/Kv/ --train-size 11898 --val-size 1494 --test-size 1543 --pretrained-model ../model/model_pretrain.pth --epochs 100 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 9.2 min; best validation MAE = 15.1994; test MAE of that model = 14.42254
+
+[7/8] Gv   (train 11,898 / val 1,494 / test 1,543)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis/data/Gv/ --train-size 11898 --val-size 1494 --test-size 1543 --pretrained-model ../model/model_pretrain.pth --epochs 100 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 9.4 min; best validation MAE = 12.5238; test MAE of that model = 12.29084
+
+[8/8] ehull   (train 37,711 / val 5,000 / test 5,000)
+  seed 42
+  $ /home/custodian/Documents/MS/venv/bin/python -W ignore -c <launcher shim code> 42 main.py --data-path /home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp_jarvis/data/ehull/ --train-size 37711 --val-size 5000 --test-size 5000 --pretrained-model ../model/model_pretrain.pth --epochs 100 -j 16    (cwd=/home/custodian/Documents/MS/CPGN/results_CPGN/JARVIS/crysxpp/src)
+  trained in 40.1 min; best validation MAE = 0.0761; test MAE of that model = 0.07773
+Scoring on the 5,000 test structures of cpgn_jarvis_test.csv
+
+============================================================================================
+  CrysXPP JARVIS-DFT - test results   (checkpoint: best_val; MAE mean +/- std over seeds)
+============================================================================================
+  Property  n_train  n_test seeds             MAE      RMSE      R2  MAD:MAE
+  Eg_opt     37,711   5,000     1    0.2636 +/-0.0000    0.5965   0.802     3.76
+  Eg_mbj      9,885   1,271     1    0.5853 +/-0.0000    1.1949   0.736     3.06
+  SLME        4,905     614     1    6.9697 +/-0.0000    9.9158   0.329     1.57
+  Spill       5,709     751     1    0.4173 +/-0.0000    0.6238   0.149     1.25
+  Kv         11,898   1,543     1   14.4225 +/-0.0000   25.5207   0.840     3.66
+  Gv         11,898   1,543     1   12.2908 +/-0.0000   20.5129   0.725     2.21
+  ehull      37,711   5,000     1    0.0777 +/-0.0000    0.1590   0.868    14.67
+============================================================================================
+  MAD:MAE uses the paper's MAD (Table 5) where defined, otherwise the test-set MAD.
+
+============================================================================================
+  CrysXPP vs CPGN on the same test structures   (lower MAE is better)
+============================================================================================
+  Property   n_test  CrysXPP MAE    CPGN MAE CrysXPP/CPGN   better
+  Eg_opt      5,000       0.2636      0.2276         1.16   CPGN
+  Eg_mbj      1,271       0.5853      0.4359         1.34   CPGN
+  SLME          614       6.9697      5.2687         1.32   CPGN
+  Spill         751       0.4173      0.4271         0.98   CrysXPP
+  Kv          1,543      14.4225     14.4762         1.00   CrysXPP
+  Gv          1,543      12.2908     11.2820         1.09   CPGN
+  ehull       5,000       0.0777      0.0880         0.88   CrysXPP
+============================================================================================
+  wrote 1 per-seed CSV(s); crysxpp_jarvis_test.csv = first seed
+
