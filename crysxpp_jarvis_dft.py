@@ -2,69 +2,6 @@
 """
 CrysXPP - JARVIS-DFT baseline on the CPGN protocol          python crysxpp_jarvis_dft.py
 =====================================================================================
-Run it exactly like cpgn_jarvis_dft.py: no arguments needed. Edit the CONFIG block
-below (or pass the same options on the command line) and run
-
-        python crysxpp_jarvis_dft.py
-
-Put it in the folder where cpgn_jarvis_dft.py was run. If cpgn_jarvis_test.csv is
-there, CrysXPP is scored on exactly CPGN's test structures and a side-by-side table
-is printed at the end. Everything is resumable: stop it any time and run it again.
-
-What "CrysXPP" is here
-----------------------
-The OFFICIAL kdmsit/crysxpp property predictor (src/main.py): a CGCNN-style network
-whose encoder is initialised from the authors' pretrained CrysAE autoencoder
-(model/model_pretrain.pth, pretrained by them on unlabelled structures) and which uses
-their feature selector. Nothing is re-implemented and no pretraining is done here.
-Settings follow the repository README: SGD, lr 0.01, batch 256, 200 epochs (the
-README's 20/20/60 split is a data-efficiency demo; your split is used instead, as
-explicit sizes).
-
-What one run does  (stages: check -> setup -> export -> train -> collect)
------------------------------------------------------------------------
- check    verifies the python environment (torch, pymatgen, scikit-learn, ...)
- setup    clones the official code (code only, no multi-GB data folder) and applies
-          the validation-selection patch
- export   loads JARVIS dft_3d, reproduces the CPGN split, writes CIFs and the label
-          files for every property
- train    one official CrysXPP run per (property, seed); resumable
- collect  validates every prediction file against the split, writes
-          crysxpp_jarvis_test.csv / crysxpp_jarvis_summary.csv / crysxpp_vs_cpgn.csv, plots
-
-Same data and split as cpgn_jarvis_dft.py (checked against its source by test)
------------------------------------------------------------------------------
-  data    jarvis.db.figshare.data("dft_3d")          -> 75,993 entries (jarvis-tools 2026.4.2)
-  split   random.Random(42).shuffle(range(len)); train = first min(37711, len-10000),
-          then 5,000 val and 5,000 test (47,711 used; the other 28,282 are never used)
-  labels  None / "na" / NaN / inf / unparsable = missing, as in extract_targets()
-
-CrysXPP is trained per property on the labelled structures of each split.
-
-Differences from the official code, and why (each is intentional)
------------------------------------------------------------------
-  * the official script builds only train and test loaders and keeps the epoch with the best
-    TEST error; it is patched to build a validation loader, select on VALIDATION error, and
-    then write the test predictions of that model (same protocol as cpgn_jarvis_dft.py).
-    Its log lines "Test MAE" / "Best Test MAE" then show VALIDATION values, so they are
-    relabelled "Val MAE (selection)" / "Best Val MAE"
-  * the official data loader shuffles id_prop.csv; the shuffle is removed so the exported
-    train -> val -> test order is kept (the split is yours, not a random one)
-  * seeds: the official code sets none; the launcher seeds python, numpy and torch
-  * torch >= 2.6 refuses to unpickle the pretrained model by default
-    -> TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
-  * data loading uses --workers (default: your CPU count, at most 16); the official default of
-    0 rebuilds every neighbour graph from its CIF in the main process every epoch
-  * unchanged official behaviour you should know: the target normaliser is fitted on up to
-    2,000 random structures of the whole dataset (test included); no early stopping
-
-Dataset version warning: the split depends on len(dft_3d). jarvis-tools 2022.12.11 ...
-2026.4.2 serve the 75,993-entry file used in your paper; 2022.9.16 serves 55,722 and
-2026.6.12 a ~94k file. The script refuses any other length (--allow-other-total).
-
-Dependencies (same venv as CPGN is fine): torch, jarvis-tools, pymatgen, scikit-learn,
-scipy, matplotlib, pytz, tqdm. git is needed to clone the code. Missing packages are
-listed by the check stage.
 """
 import argparse
 import csv
@@ -94,7 +31,7 @@ TRAIN_PYTHON = None               # None: the python running this script
 DATASET_JSON = None               # None: load with jarvis-tools like cpgn_jarvis_dft.py
 PROPS = "main8"                   # main8 (paper Table 5) | all | e.g. "Ef,Eg_opt,Kv"
 SEEDS = [42]                      # e.g. [42, 43, 44] for mean +/- std
-EPOCHS = 100                      # CrysXPP README setting
+EPOCHS = 200                      # CrysXPP README setting
 LR = None                         # None: official default (0.01, SGD)
 BATCH_SIZE = None                 # None: official default (256)
 WORKERS = None                    # data-loading processes (None: CPU count, at most 16)
