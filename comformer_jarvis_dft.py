@@ -2,6 +2,76 @@
 """
 ComFormer - JARVIS-DFT baseline on the CPGN protocol          python comformer_jarvis_dft.py
 =====================================================================================
+Run it exactly like cpgn_jarvis_dft.py: no arguments needed. Edit the CONFIG block
+below (or pass the same options on the command line) and run
+
+        python comformer_jarvis_dft.py
+
+Put it in the folder where cpgn_jarvis_dft.py was run. If cpgn_jarvis_test.csv is
+there, ComFormer is scored on exactly CPGN's test structures and a side-by-side table
+is printed at the end. Everything is resumable: stop it any time and run it again.
+
+What "ComFormer" is here
+------------------------
+The OFFICIAL YKQ98/ComFormer code (ICLR 2024), by default the invariant variant
+iComFormer (4.97M parameters); set MODEL = "eComformer" for the equivariant one.
+Nothing is re-implemented. Settings are the repository's own JARVIS recipe
+(scripts/train_jarvis.py): AdamW, lr 1e-3, batch 64, cutoff 4.0 A, 25 neighbours,
+use_lattice=True, use_angle=False - with ONE change requested here: 100 epochs instead
+of the official 500 (EPOCHS below). The schedule (OneCycleLR) is stretched over the
+epochs you set, so a 100-epoch run is a complete, shorter schedule, not a truncated one.
+
+What one run does  (stages: check -> setup -> export -> train -> collect)
+-----------------------------------------------------------------------
+ check    verifies the python environment (torch, torch_geometric, e3nn, ...)
+ setup    clones the official code (code only) and applies the compatibility patches below
+ export   loads JARVIS dft_3d, reproduces the CPGN split, writes one dataset file per property
+ train    one official ComFormer run per (property, seed); resumable; scores the
+          best-VALIDATION checkpoint
+ collect  validates every prediction file against the split, writes
+          comformer_jarvis_test.csv / comformer_jarvis_summary.csv / comformer_vs_cpgn.csv, plots
+
+Same data and split as cpgn_jarvis_dft.py (checked against its source by test)
+-----------------------------------------------------------------------------
+  data    jarvis.db.figshare.data("dft_3d")          -> 75,993 entries (jarvis-tools 2026.4.2)
+  split   random.Random(42).shuffle(range(len)); train = first min(37711, len-10000),
+          then 5,000 val and 5,000 test (47,711 used; the other 28,282 are never used)
+  labels  None / "na" / NaN / inf / unparsable = missing, as in extract_targets()
+
+ComFormer is trained per property on the labelled structures of each split. Its own
+data loader is fed your split through its official `dataset_array` hook (jdata is
+replaced) and `keep_data_order=True`, so the exported train -> val -> test order is kept.
+
+The public ComFormer code cannot be run as published; these explicit patches fix that
+(each is anchored, idempotent, and keeps a .orig copy)
+---------------------------------------------------------------------------------------
+  * models/transformer.py imports from a package called `comforemr` (typo for `comformer`)
+  * models/transformer.py calls super(MatformerConv, self), a name left over from the
+    Matformer code it was forked from (NameError when the model is built)
+  * data.py does `import imp`, removed in Python 3.12 (unused)
+  * torch_scatter (compiled, not published for current PyTorch) is replaced by a
+    TorchScript-compatible pure-PyTorch module with the same semantics for the three
+    functions used (scatter, segment_csr, gather_csr); torch_sparse's SparseTensor was
+    imported but never used
+  * for regression the official train.py scores the LAST epoch and writes NO per-structure
+    predictions (its CSV writer exists only for classification). It is patched to score the
+    best-VALIDATION checkpoint (your CPGN protocol) and write id, target, prediction
+Launcher-side (printed when used): pydantic >= 2 is bridged through pydantic.v1 for ComFormer's
+config classes; numpy aliases removed in numpy 1.24 are restored; torch >= 2.6 needs
+TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1.
+
+Unchanged official behaviour you should know: train and validation loaders use
+drop_last=True (so a split smaller than the batch size cannot be trained; tiny splits get
+a smaller batch automatically); labels are standardised with the training mean/std; no
+early stopping.
+
+Dataset version warning: the split depends on len(dft_3d). jarvis-tools 2022.12.11 ...
+2026.4.2 serve the 75,993-entry file used in your paper; 2022.9.16 serves 55,722 and
+2026.6.12 a ~94k file. The script refuses any other length (--allow-other-total).
+
+Dependencies (same venv as CPGN is fine): torch, torch_geometric, jarvis-tools, pymatgen,
+e3nn, pytorch-ignite, pandarallel, pydantic, pandas, scipy, scikit-learn, sympy, matplotlib,
+tqdm. git is needed to clone the code. Missing packages are listed by the check stage.
 """
 import argparse
 import csv
@@ -32,7 +102,7 @@ DATASET_JSON = None               # None: load with jarvis-tools like cpgn_jarvi
 MODEL = "iComformer"              # iComformer (invariant, official JARVIS script) | eComformer (equivariant)
 PROPS = "main8"                   # main8 (paper Table 5) | all | e.g. "Ef,Eg_opt,Kv"
 SEEDS = [42]                      # e.g. [42, 43, 44] for mean +/- std
-EPOCHS = 200                      # requested; the official ComFormer setting is 500
+EPOCHS = 50                      # requested; the official ComFormer setting is 500
 LR = None                         # None: official 0.001 (AdamW)
 BATCH_SIZE = None                 # None: official 64
 WORKERS = None                    # data-loading processes (None: CPU count, at most 8)
