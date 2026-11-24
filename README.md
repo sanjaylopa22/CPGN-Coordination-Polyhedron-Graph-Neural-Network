@@ -160,6 +160,22 @@ Each training script produces the following outputs in its working directory:
 | `*_property_maes.png` | Bar chart comparing all property MAEs to published benchmarks |
 | `*_benchmark_table.png` | Horizontal bar chart: MAE and MAD:MAE vs CGCNN/MEGNet/SchNet/ALIGNN |
 
+
+**Ablation Scripts:**
+
+python test_ablation_engine.py                       # seconds, no GPU or data
+python cpgn_ablation_jarvis.py --params-only         # parameter counts, no data needed
+python cpgn_ablation_jarvis.py                       # A,B,C,D,G x seeds 42 43 44, resumable
+python cpgn_ablation_jarvis.py --variants E1,E2,E3   # the appendix topology table
+
+**python cpgn_ablation_table.py --results ablation_results --decimals 3 --ef-decimals 4**
+
+
+python cpgn_ablation_mp.py --params-only
+python cpgn_ablation_mp.py                           # same for MP
+python cpgn_ablation_mp.py --variants A --seeds 42
+
+python cpgn_ablation_table.py --results ablation_results --decimals 3 --ef-decimals 4
 ---
 
 ## Key Design Decisions
